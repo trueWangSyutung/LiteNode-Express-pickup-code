@@ -1,5 +1,7 @@
 package cn.tw.sar.note
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -121,9 +123,13 @@ class AboutActivity : ComponentActivity() {
                                             0.dp, 15.dp
                                         )
                                         .clickable {
-                                            if (it.title == "用户协议") {
-
-                                            } else if (it.title == "隐私政策") {
+                                            if (it.title == "Github") {
+                                                // 打开网页
+                                                startActivity(Intent(
+                                                    Intent.ACTION_VIEW,
+                                                    Uri.parse("https://github.com/trueWangSyutung/LiteNode-Express-pickup-code"
+                                                    )
+                                                ))
 
                                             }
                                         },
