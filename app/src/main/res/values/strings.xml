@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Lite Note</string>
+    <string name="title_activity_init" translatable="false">InitActivity</string>
+    <string name="title_activity_add" translatable="false">AddActivity</string>
+    <string name="title_activity_code_format" translatable="false">CodeFormatActivity</string>
+    <string name="title_activity_code_add" translatable="false">CodeAddActivity</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="title_activity_ports" translatable="false">PortsActivity</string>
+    <string name="title_activity_ports_add" translatable="false">PortsAddActivity</string>
+    <string name="title_activity_express" translatable="false">ExpressActivity</string>
+    <string name="title_activity_express_add" translatable="false">ExpressAddActivity</string>
+    <string name="title_activity_more_settings2" translatable="false">MoreSettingsActivity2</string>
+    <string name="title_activity_check_update" translatable="false">CheckUpdateActivity</string>
+    <string name="title_activity_main" translatable="false">MainActivity</string>
+    <string name="title_activity_subscibr_add" translatable="false">SubscibrAddActivity</string>
+    <string name="title_activity_policy">PolicyActivity</string>
+    <string name="title_activity_agent">AgentActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">轻笔记</string>
+    <string name="appwidget_text">桌面取件码</string>
+    <string name="add_widget">桌面取件码</string>
+    <string name="app_widget_description">桌面取件码</string>
+</resources>
