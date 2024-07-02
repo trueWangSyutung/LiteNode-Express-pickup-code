@@ -10,12 +10,15 @@ import cn.tw.sar.note.dao.CodeDao
 import cn.tw.sar.note.dao.DetailDao
 import cn.tw.sar.note.dao.ExpressDao
 import cn.tw.sar.note.dao.FormatDao
+import cn.tw.sar.note.dao.NoteDao
 import cn.tw.sar.note.dao.PortsDao
 import cn.tw.sar.note.dao.SubscribeDao
 import cn.tw.sar.note.entity.Code
 import cn.tw.sar.note.entity.CodeDetail
 import cn.tw.sar.note.entity.CodeFormat
 import cn.tw.sar.note.entity.Express
+import cn.tw.sar.note.entity.NoteClass
+import cn.tw.sar.note.entity.Notes
 import cn.tw.sar.note.entity.PostStation
 import cn.tw.sar.note.entity.Subscribe
 
@@ -192,13 +195,75 @@ private val MIGRATION_6_7 = object : Migration(6,7) {
     }
 }
 
+private val MIGRATION_8_9 = object : Migration(8,9)  {
+    override fun migrate(db: SupportSQLiteDatabase) {
+
+
+
+
+    }
+
+}
+
+
+
+private val MIGRATION_9_10 = object : Migration(9,10)  {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // @Entity(tableName = "note_detail")
+        //data class Notes(
+        //    @PrimaryKey(autoGenerate = true)
+        //    val id: Long = 0,
+        //    var noteTitle:String,  // 标题
+        //    var classID :Long,  // 分类ID
+        //    var noteContent: String, // 内容
+        //    var insertTime: Long, // 插入时间
+        //    var updateTime: Long, // 更新时间
+        //
+        //    var noteState :Int, // 状态
+        //
+        //)
+        val sql = "CREATE TABLE note_detail (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "noteTitle TEXT NOT NULL DEFAULT '', " +
+                "classID INTEGER NOT NULL DEFAULT 0, " +
+                "noteContent TEXT NOT NULL DEFAULT '', " +
+                "insertTime INTEGER NOT NULL DEFAULT 0, " +
+                "updateTime INTEGER NOT NULL DEFAULT 0, " +
+                "noteState INTEGER NOT NULL DEFAULT 0);"
+        db.execSQL(sql)
+
+        // @Entity(tableName = "note_class")
+        //data class NoteClass(
+        //    @PrimaryKey(autoGenerate = true)
+        //    val id: Long = 0,
+        //    var className:String,  // 站点名称
+        //    var classState :Int,  // 站点地址
+        //    var insertTime: Long, // 插入时间
+        //)
+        val sql2 = "CREATE TABLE note_class (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "className TEXT NOT NULL DEFAULT '', " +
+                "classState INTEGER NOT NULL DEFAULT 0, " +
+                "insertTime INTEGER NOT NULL DEFAULT 0);"
+        db.execSQL(sql2)
+        // 插入默认分类
+        val sql3 = "INSERT INTO note_class (id,className, classState, insertTime) VALUES (0, '默认分类', 0, strftime('%s','now'));"
+        db.execSQL(sql3)
+
+
+
+
+    }
+
+}
+
+
 @Database(entities = [Code::class,
                       CodeFormat::class,
                       CodeDetail::class,
                       PostStation::class,
                       Express::class,
-                      Subscribe::class
-                     ], version = 8, exportSchema = false)
+                      Subscribe::class,
+                      Notes::class, NoteClass::class
+                     ], version = 10, exportSchema = false)
 abstract class CodeDatabase : RoomDatabase() {
 
     abstract fun codeDao(): CodeDao
@@ -207,6 +272,9 @@ abstract class CodeDatabase : RoomDatabase() {
     abstract fun portsDao(): PortsDao
     abstract fun expressDao(): ExpressDao
     abstract fun subscribeDao(): SubscribeDao
+
+
+    abstract fun noteDao(): NoteDao
 
 
     companion object {
@@ -225,7 +293,8 @@ abstract class CodeDatabase : RoomDatabase() {
                     .addMigrations(MIGRATION_4_5)
                     .addMigrations(MIGRATION_5_6)
                     .addMigrations(MIGRATION_6_7)
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_8_9)
+                    .addMigrations(MIGRATION_9_10)
                     .build()
                 INSTANCE = instance
                 return instance

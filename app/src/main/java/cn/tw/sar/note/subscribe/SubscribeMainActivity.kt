@@ -58,16 +58,23 @@ class SubscribeMainActivity : ComponentActivity() {
         //    )
         Log.d("MainActivity", "onSeleted ${curr.value}")
 
-        page.value = 1
         sum.value = 0.0
 
         if (curr.value == 0) {
             thread {
-                list.clear()
                 val lists = subscribeDao.getAll(
                     (page.value-1) * pageSize,
                     pageSize
                 )
+                if (lists.isEmpty()) {
+                    runOnUiThread {
+                        Toast.makeText(this@SubscribeMainActivity, "没有更多数据", Toast.LENGTH_SHORT).show()
+                        if (page.value > 1) {
+                            page.value -= 1
+                        }
+                    }
+                    return@thread
+                }
                 lists.forEach { item ->
                     // 判断有没有距离当前时间超过一个付款周期的
                     var duractionShow : Long = when(item.subscribeType){
@@ -100,13 +107,23 @@ class SubscribeMainActivity : ComponentActivity() {
 
                 }
             }
-        } else  if (curr.value == 1) {
+        }
+        else  if (curr.value == 1) {
             thread {
-                list.clear()
+
                 var lists = subscribeDao.getAll(
                     (page.value-1) * pageSize,
                     pageSize
                 )
+                if (lists.isEmpty()) {
+                    runOnUiThread {
+                        Toast.makeText(this@SubscribeMainActivity, "没有更多数据", Toast.LENGTH_SHORT).show()
+                        if (page.value > 1) {
+                            page.value -= 1
+                        }
+                    }
+                    return@thread
+                }
                 lists.forEach { item ->
                     // 判断是否是日付
                     if (item.subscribeType == SubscribeType.Daily) {
@@ -136,13 +153,23 @@ class SubscribeMainActivity : ComponentActivity() {
                     list.addAll(lists)
                 }
             }
-        } else  if (curr.value == 2) {
+        }
+        else  if (curr.value == 2) {
             thread {
-                list.clear()
+
                 var lists = subscribeDao.getAll(
                     (page.value-1) * pageSize,
                     pageSize
                 )
+                if (lists.isEmpty()) {
+                    runOnUiThread {
+                        Toast.makeText(this@SubscribeMainActivity, "没有更多数据", Toast.LENGTH_SHORT).show()
+                        if (page.value > 1) {
+                            page.value -= 1
+                        }
+                    }
+                    return@thread
+                }
                 lists.forEach { item ->
                     // 判断是否是周付
                     if (item.subscribeType == SubscribeType.Daily) {
@@ -171,13 +198,23 @@ class SubscribeMainActivity : ComponentActivity() {
                     list.addAll(lists)
                 }
             }
-        } else  if (curr.value == 3) {
+        }
+        else  if (curr.value == 3) {
             thread {
-                list.clear()
+
                 var lists = subscribeDao.getAll(
                     (page.value-1) * pageSize,
                     pageSize
                 )
+                if (lists.isEmpty()) {
+                    runOnUiThread {
+                        Toast.makeText(this@SubscribeMainActivity, "没有更多数据", Toast.LENGTH_SHORT).show()
+                        if (page.value > 1) {
+                            page.value -= 1
+                        }
+                    }
+                    return@thread
+                }
                 lists.forEach { item ->
                     // 判断是否是月付
                     if (item.subscribeType == SubscribeType.Daily) {
@@ -207,13 +244,23 @@ class SubscribeMainActivity : ComponentActivity() {
                     list.addAll(lists)
                 }
             }
-        } else  if (curr.value == 4) {
+        }
+        else  if (curr.value == 4) {
             thread {
-                list.clear()
+
                 var lists = subscribeDao.getAll(
                     (page.value-1) * pageSize,
                     pageSize
                 )
+                if (lists.isEmpty()) {
+                    runOnUiThread {
+                        Toast.makeText(this@SubscribeMainActivity, "没有更多数据", Toast.LENGTH_SHORT).show()
+                        if (page.value > 1) {
+                            page.value -= 1
+                        }
+                    }
+                    return@thread
+                }
                 lists.forEach { item ->
                     // 判断是否是季付
                     if (item.subscribeType == SubscribeType.Daily) {
@@ -243,13 +290,22 @@ class SubscribeMainActivity : ComponentActivity() {
                 }
             }
         }
-          else  if (curr.value == 5) {
+        else  if (curr.value == 5) {
             thread {
-                list.clear()
+
                 var lists = subscribeDao.getAll(
                     (page.value-1) * pageSize,
                     pageSize
                 )
+                if (lists.isEmpty()) {
+                    runOnUiThread {
+                        Toast.makeText(this@SubscribeMainActivity, "没有更多数据", Toast.LENGTH_SHORT).show()
+                        if (page.value > 1) {
+                            page.value -= 1
+                        }
+                    }
+                    return@thread
+                }
                 lists.forEach { item ->
                     // 判断是否是季付
                     if (item.subscribeType == SubscribeType.Daily) {
@@ -285,6 +341,8 @@ class SubscribeMainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        page.value = 1
+        list.clear()
         loadingList()
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -411,7 +469,11 @@ class SubscribeMainActivity : ComponentActivity() {
                                     )
                                 )
                             },
-                            sum = sum.value
+                            sum = sum.value,
+                            loadMore = {
+                                page.value += 1
+                                loadingList()
+                            }
                         )
                     }
                 }

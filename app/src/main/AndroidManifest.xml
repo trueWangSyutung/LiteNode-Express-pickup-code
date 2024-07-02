@@ -24,6 +24,11 @@
         android:theme="@style/Theme.LiteNote"
         tools:targetApi="31">
         <activity
+            android:name=".AddNoteActivity"
+            android:exported="false"
+            android:label="@string/title_activity_add_note"
+            android:theme="@style/Theme.LiteNote" />
+        <activity
             android:name=".AboutActivity"
             android:exported="false"
             android:label="@string/title_activity_about"

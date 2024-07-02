@@ -18,4 +18,5 @@
     <string name="title_activity_policy">PolicyActivity</string>
     <string name="title_activity_agent">AgentActivity</string>
     <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_add_note">AddNoteActivity</string>
 </resources>

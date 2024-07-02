@@ -14,8 +14,8 @@ android {
         minSdk= 29
         maxSdk =35
         targetSdk =35
-        versionCode = 100008
-        versionName = "0.0.8(Beta Preview)"
+        versionCode = 100010
+        versionName = "0.1.0(Beta Preview)"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -54,6 +54,24 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    packagingOptions {
+        pickFirst("META-INF/LICENSE.md")
+
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE")
+        exclude("META-INF/LICENSE.txt")
+        exclude("META-INF/license.txt")
+        exclude("META-INF/NOTICE")
+        exclude("META-INF/NOTICE.txt")
+        exclude("META-INF/NOTICE.md")
+        exclude("META-INF/notice.txt")
+        exclude("META-INF/ASL2.0")
+
+
+
+        exclude("META-INF/*.kotlin_module")
+    }
+
 
 }
 
@@ -120,6 +138,11 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-insets:0.16.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.16.0")
+
+
+    implementation(libs.jeziellago.compose.markdown)
+
+
 
 
 }

@@ -62,7 +62,8 @@ fun AboutPage(
     clickYh : () -> Unit = {},
     clickYs : () -> Unit = {},
     show : Boolean = true,
-    aboutMe : () -> Unit = {}
+    aboutMe : () -> Unit = {},
+    clickDy : () -> Unit = {},
 ) {
     var systemVersion =  context.packageManager.getPackageInfo(context.packageName, 0).versionName
     var versionCode = context.packageManager.getPackageInfo(context.packageName, 0).versionCode
@@ -85,7 +86,7 @@ fun AboutPage(
             mutableStateOf("")
         }
         Column {
-            Text(text = "关于我们", color = fontColor,
+            Text(text = "更多", color = fontColor,
                 fontSize = 35.sp,
                 modifier = Modifier.fillMaxWidth(),
 
@@ -106,6 +107,49 @@ fun AboutPage(
             )
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth().background(
+                color = subBackgroundColor,
+                shape = MaterialTheme.shapes.medium
+            )
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().background(
+                    color = subBackgroundColor,
+                    shape = MaterialTheme.shapes.medium
+                ).padding(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(
+                        0.dp, 15.dp
+                    ).clickable {
+                        clickDy()
+                    },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "订阅记录", color = fontColor, fontSize = 20.sp)
+                }
+            }
+            Column(
+                modifier = Modifier.fillMaxWidth().background(
+                    color = subBackgroundColor,
+                    shape = MaterialTheme.shapes.medium
+                ).padding(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(
+                        0.dp, 15.dp
+                    ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "更多功能,敬请期待", color = fontColor, fontSize = 20.sp)
+                }
+            }
+
+        }
         Spacer(modifier = Modifier.height(20.dp))
 
         Column(

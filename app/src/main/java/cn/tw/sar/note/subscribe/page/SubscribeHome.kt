@@ -33,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -259,6 +260,7 @@ fun SubscribeHomePage(
     onAddClick: () -> Unit = {  },
     onselectNum: Int = 0,
     sum:Double = 0.0,
+    loadMore: () -> Unit = {  }
 ){
     val filters = listOf(
         "默认", "日付", "周付","月付", "季付", "年付",
@@ -412,6 +414,17 @@ fun SubscribeHomePage(
                     }
 
 
+                }
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextButton(onClick = {
+                        loadMore()
+                    }) {
+                        Text(text = "加载更多", color = fontColor, fontSize = 12.sp)
+                    }
                 }
             }
         }

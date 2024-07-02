@@ -94,9 +94,16 @@ import android.icu.text.IDNA.Info
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.core.app.NotificationCompat
+import cn.tw.sar.note.entity.NoteClass
+import cn.tw.sar.note.entity.Notes
 import cn.tw.sar.note.pages.MorePage
+import cn.tw.sar.note.pages.NotePage
 import cn.tw.sar.note.subscribe.SubscribeMainActivity
+import cn.tw.sar.note.utils.LogUpdate
 import cn.tw.sar.note.utils.isDarkMode
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import retrofit2.Call
@@ -105,6 +112,12 @@ import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     var list  = mutableStateListOf<CodeAndYz>()
+    var noteList = mutableStateListOf<Notes>()
+    var notePage = mutableStateOf(1)
+    var notePageSize = 15
+    var noteClassList = mutableStateListOf<NoteClass>()
+    var noteCurrClass = mutableStateOf(0L)
+
     var isAgent = mutableStateOf(false)
 
     var selectIndex =  mutableStateOf(0)
@@ -136,23 +149,123 @@ class MainActivity : ComponentActivity() {
 
 
     var labelList = listOf(
-        "首页",
-        "更多",
+        "笔记",
+        "取件码",
         "总览",
-        "设置"
+        "更多",
     )
     var iconList = listOf(
         Icons.Filled.Home,
-        Icons.Filled.Menu,
+        Icons.Filled.Notifications,
         Icons.Filled.DateRange,
-        Icons.Filled.Settings
+        Icons.Filled.Menu,
     )
+    fun loadNoteClass(){
+        thread {
+            val database: CodeDatabase =
+                CodeDatabase.getDatabase(this@MainActivity)
+            val noteDao = database.noteDao()
+            val q = noteDao.getAllClass()
+            Log.d("MainActivity", "noteClassList: $q")
+            runOnUiThread {
+                noteClassList.clear()
+                noteClassList.addAll(q)
+            }
+        }
+    }
+    fun loadNote(
 
+    ){
+        thread {
+            val database: CodeDatabase =
+                CodeDatabase.getDatabase(this@MainActivity)
+            val noteDao = database.noteDao()
+            val q = noteDao.getAllNotes((notePage.value-1)*notePageSize,notePageSize,noteCurrClass.value)
+            Log.d("MainActivity", "noteList: $q")
+            runOnUiThread {
+                noteList.clear()
+                // 简化内容为 100个字符
+                for (item in q){
+                    if (item.noteContent.length>100){
+                        item.noteContent = item.noteContent.substring(0,100)
+                    }
+                    noteList.add(item)
+                }
+
+            }
+        }
+    }
+
+    fun loadMoreNote(
+
+    ){
+        thread {
+            val database: CodeDatabase =
+                CodeDatabase.getDatabase(this@MainActivity)
+            val noteDao = database.noteDao()
+
+            val q = noteDao.getAllNotes((notePage.value-1)*notePageSize,notePageSize,noteCurrClass.value)
+            Log.d("MainActivity", "noteList: $q")
+            runOnUiThread {
+                if (q.size>0){
+                    noteList.clear()
+                    // 简化内容为 100个字符
+                    for (item in q){
+                        if (item.noteContent.length>100){
+                            item.noteContent = item.noteContent.substring(0,100)
+                        }
+                        noteList.add(item)
+                    }
+                }else{
+                    Toast.makeText(this@MainActivity, "没有更多了", Toast.LENGTH_SHORT).show()
+                    if (notePage.value > 1) {
+                        notePage.value -= 1
+                    }
+                }
+
+            }
+        }
+    }
+    fun  initDatabase(){
+        thread {
+            val database: CodeDatabase =
+                CodeDatabase.getDatabase(this@MainActivity)
+            val noteDao = database.noteDao()
+            val q = noteDao.getClassCount(0L)
+            if (q == 0){
+                noteDao.insertClass(NoteClass(0,"默认分类",0,System.currentTimeMillis()))
+            }
+
+        }
+    }
     override fun onResume() {
         super.onResume()
-        val sharedPreferences = getSharedPreferences("init", MODE_PRIVATE)
-        val isFirst = sharedPreferences.getBoolean("agent", false)
 
+        val sharedPreferences = getSharedPreferences("init", MODE_PRIVATE)
+        var isFirst = sharedPreferences.getBoolean("agent", false)
+        val permissionsNow = listOf(
+            "android.permission.RECEIVE_SMS",
+            "android.permission.READ_SMS",
+            "android.permission.POST_NOTIFICATIONS",
+            "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+        )
+        // 判断是否有悬浮窗权限
+        if (!PermissionUtils.checkShowOnLockScreen(this@MainActivity)) {
+            // 权限请求成功
+            Log.d("MainActivity", "start service")
+        } else {
+            Log.d("MainActivity", "start service")
+            if (PermissionUtils.checkPermissions(
+                    this@MainActivity,
+                    permissionsNow.toTypedArray()
+                )
+            ) {
+                // 请求成功
+                isFirst = true
+                sharedPreferences.edit().putBoolean("agent", true).apply()
+            }
+        }
+        initDatabase()
         Log.d("MainActivity onResume", "isFirst: $isFirst")
         if (!isFirst) {
             isAgent.value = false
@@ -166,10 +279,22 @@ class MainActivity : ComponentActivity() {
             Log.d("MainActivity", "start service")
         }
 
-        loadingBar()
-        loadCodeFormat()
-        loadingBar()
-        loadingStrList()
+        if (selectIndex.value == 1) {
+            loadingList()
+            loadingBar()
+            loadCodeFormat()
+            loadingStrList()
+        } else if (selectIndex.value == 0) {
+            loadNoteClass()
+            loadNote()
+        } else if (selectIndex.value == 2) {
+            loadingBar()
+            loadCodeFormat()
+        } else if (selectIndex.value == 3) {
+            loadingStrList()
+            loadCodeFormat()
+        }
+
     }
     fun loadingStrList(){
         thread {
@@ -364,6 +489,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // 请求网络权限
         val netList = arrayOf(
             "android.permission.INTERNET",
@@ -371,7 +497,6 @@ class MainActivity : ComponentActivity() {
         if (!PermissionUtils.checkPermissions(this, netList)){
             PermissionUtils.requestPermissions(this, netList,99)
         }
-
 
 
         enableEdgeToEdge()
@@ -897,6 +1022,16 @@ class MainActivity : ComponentActivity() {
                                                     if (selectIndex.value == 1) {
                                                         loadingBar()
                                                         loadCodeFormat()
+                                                        loadingStrList()
+                                                    } else if (selectIndex.value == 0) {
+                                                        loadNoteClass()
+                                                        loadNote()
+                                                    } else if (selectIndex.value == 2) {
+                                                        loadingBar()
+                                                        loadCodeFormat()
+                                                    } else if (selectIndex.value == 3) {
+                                                        loadingStrList()
+                                                        loadCodeFormat()
                                                     }
                                                     print("selectIndex = ${selectIndex.value}")
 
@@ -927,14 +1062,14 @@ class MainActivity : ComponentActivity() {
 
                                         }
                                     }
-                                    if (selectIndex.value == 0 || selectIndex.value == 1) {
+                                    if (selectIndex.value == 0 || selectIndex.value == 1 || selectIndex.value == 2) {
                                         IconButton(
                                             onClick = {
-                                                if (selectIndex.value == 0) {
+                                                if (selectIndex.value == 1) {
                                                     /// 刷新
                                                     loadingList()
 
-                                                } else if (selectIndex.value == 1) {
+                                                } else if (selectIndex.value == 3) {
                                                     loadingBar()
                                                 }
                                             },
@@ -981,6 +1116,44 @@ class MainActivity : ComponentActivity() {
                     ) {
                         when (selectIndex.value) {
                             0 -> {
+                                NotePage(
+                                    backgroundColor = getDarkModeBackgroundColor(
+                                        this@MainActivity, 0
+                                    ),
+                                    subBackgroundColor = getDarkModeBackgroundColor(
+                                        this@MainActivity, 1
+                                    ),
+                                    fontColor = getDarkModeTextColor(this@MainActivity),
+                                    list = noteList,
+                                    classLists = noteClassList,
+                                    onSeleted = { id ->
+                                        Log.d("MainActivity", "onSeleted $id")
+                                        noteCurrClass.value = noteClassList[id].id
+                                        notePage.value = 1
+                                    },
+
+
+                                    onAddClick = {
+                                       val intent = Intent(this@MainActivity, AddNoteActivity::class.java)
+                                        startActivity(intent)
+                                    },
+                                    isagent = isAgent.value,
+                                    getAgent = {
+                                        val intent = Intent(this@MainActivity, AgentActivity::class.java)
+                                        startActivity(intent)
+                                    },
+                                    clickItem = {
+                                        val intent = Intent(this@MainActivity, AddNoteActivity::class.java)
+                                        intent.putExtra("id",noteList[it].id)
+                                        startActivity(intent)
+                                    },
+                                    loadMore = {
+                                        notePage.value +=1
+                                        loadMoreNote()
+                                    }
+                                )
+                            }
+                            1 -> {
                                 HomePage(
                                     backgroundColor = getDarkModeBackgroundColor(
                                         this@MainActivity, 0
@@ -1038,32 +1211,6 @@ class MainActivity : ComponentActivity() {
                                     }
                                )
                             }
-                            1 ->{
-                                MorePage(
-                                    subBackgroundColor = getDarkModeBackgroundColor(
-                                        this@MainActivity, 1
-                                    ),
-                                    fontColor = getDarkModeTextColor(this@MainActivity),
-                                    formatsNum = formatsNum.value,
-                                    click = {
-                                        val intent = Intent(this@MainActivity, SubscribeMainActivity::class.java)
-                                        startActivity(intent)
-                                    },
-                                    click2 = {
-                                        Toast.makeText(this@MainActivity,"敬请期待",Toast.LENGTH_SHORT).show()
-
-                                    },
-                                    click3 = {
-
-                                    },
-                                    click4 = {
-
-                                    },
-                                    click5 = {
-
-                                    },
-                                )
-                            }
                             2 -> {
                                 OverPage(
                                     backgroundColor = getDarkModeBackgroundColor(
@@ -1083,9 +1230,8 @@ class MainActivity : ComponentActivity() {
                                         Log.d("MainActivity", "timeStart = $timeStart timeEnd = $timeEnd")
                                     },
 
-                                )
+                                    )
                             }
-
                             3 -> {
                                 AboutPage(
                                     backgroundColor = getDarkModeBackgroundColor(
@@ -1131,6 +1277,10 @@ class MainActivity : ComponentActivity() {
                                     },
                                     aboutMe = {
                                         val intent = Intent(this@MainActivity, AboutActivity::class.java)
+                                        startActivity(intent)
+                                    },
+                                    clickDy = {
+                                        val intent = Intent(this@MainActivity, SubscribeMainActivity::class.java)
                                         startActivity(intent)
                                     }
                                 )

@@ -73,12 +73,8 @@ private fun timeStempToTime(timest: Long): String {
 fun MorePage(
     subBackgroundColor : Color = Color(0xFFFFFAF8),
     fontColor : Color = Color.Black,
-    formatsNum : Int = 0,
     click : () -> Unit = {},
-    click2 : () -> Unit = {},
-    click3 : () -> Unit = {},
-    click4 : () -> Unit = {},
-    click5 : () -> Unit = {},
+
 
 ){
     Column(

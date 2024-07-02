@@ -13,6 +13,7 @@ import cn.tw.sar.note.data.CodeDatabase
 import cn.tw.sar.note.entity.Code
 import cn.tw.sar.note.entity.CodeConfig
 import cn.tw.sar.note.service.FocusService
+import cn.tw.sar.note.utils.LogUpdate
 import cn.tw.sar.note.utils.PermissionUtils
 import cn.tw.sar.note.utils.PickupCodeUtils
 import kg.edu.yjut.litenote.miui.MiuiStringToast
@@ -76,15 +77,19 @@ class MessageReciever : BroadcastReceiver() {
                             )
                         )
                     }else{
-                        showQujianma(
-                            context,
-                            CodeConfig(
-                                code[0],
-                                company,
-                                0,
-                                yz
+                        try {
+                            showQujianma(
+                                context,
+                                CodeConfig(
+                                    code[0],
+                                    company,
+                                    0,
+                                    yz
+                                )
                             )
-                        )
+                        } catch (e:Exception){
+                            LogUpdate.updateLog("MessageReciever",e.toString(),sBuilder.toString())
+                        }
                     }
                     thread {
                         val database: CodeDatabase =

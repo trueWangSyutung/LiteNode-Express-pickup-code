@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 100008,
-      "versionName": "0.0.8(Beta Preview)",
+      "versionCode": 100010,
+      "versionName": "0.1.0(Beta Preview)",
       "outputFile": "app-release.apk"
     }
   ],

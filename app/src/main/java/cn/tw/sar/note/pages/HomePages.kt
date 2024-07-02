@@ -311,7 +311,7 @@ fun HomePage(
                 .fillMaxWidth()
         ){
             Column {
-                Text(text = "首页", color = fontColor, fontSize = 35.sp)
+                Text(text = "取件码", color = fontColor, fontSize = 35.sp)
             }
 
             IconButton(
